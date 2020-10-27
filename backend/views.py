@@ -17,7 +17,8 @@ from rest_framework.views import APIView
 from rest_framework import status
 
 from .serializers import VideoSerializer, TagSerializer, PlaylistVideoSerializer, TagDetailSerializer, UserDetailSerializer, UserSerializer,\
-    ViewHistorySerializer, ChallengeSerializer, CommentSerializer, VideoViewSerializer, VideoSerializerUpdate, VideoSerializerUpdateView
+    ViewHistorySerializer, ChallengeSerializer, CommentSerializer, VideoViewSerializer, VideoSerializerUpdate, VideoSerializerUpdateView, \
+    PlaylistVideoSerializerUpdate,UserTestSerializer
 
 from .models import Video, Tag, PlaylistVideo, TagDetail, UserDetail, Comment, Challenge, ViewHistory
 
@@ -28,8 +29,6 @@ def convertImagetofile(img):
     ext = format.split('/')[-1]
     image_name = str(uuid.uuid4()) + "."+ext
     return ContentFile(base64.b64decode(imgstr), image_name)
-
-
 
 class VideoViewset(viewsets.ModelViewSet):
     queryset = Video.objects.all()
@@ -67,7 +66,7 @@ class VideoAPIViewUpdate(generics.RetrieveUpdateDestroyAPIView):
 
     @csrf_exempt
     def put(self, request, pk, format=None):
-
+        request.data['image'] = convertImagetofile(request.data.get('image'))
         try:
             item = Video.objects.get(pk=pk)
         except Video.DoesNotExist:
@@ -86,6 +85,59 @@ class VideoAPIViewUpdate(generics.RetrieveUpdateDestroyAPIView):
         item.delete()
         return Response(status=204)
 
+class PlaylistVideoViewset(viewsets.ModelViewSet):
+    queryset = PlaylistVideo.objects.all()
+    serializer_class = PlaylistVideoSerializer
+
+
+class PlaylistVideoAPIView(APIView):
+    def get(self, request, pk, format=None):
+        return Response({"hello": pk})
+
+    def post(self, request, format=None):
+        form = {
+            "name": request.data.get('name', ),
+            "image": request.data.get('image', ),
+            "description": request.data.get('description', ),
+        }
+
+        serializer = PlaylistVideoAPIViewUpdate(data=form)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
+class PlaylistVideoAPIViewUpdate(generics.RetrieveUpdateDestroyAPIView):
+    def get(self, request, pk, format=None):
+
+        try:
+            item = PlaylistVideo.objects.get(pk=pk)
+            serializer = PlaylistVideoSerializerUpdate(item)
+            return Response(serializer.data)
+        except PlaylistVideo.DoesNotExist:
+            return Response(status=404)
+
+    @csrf_exempt
+    def put(self, request, pk, format=None):
+        request.data['image'] = convertImagetofile(request.data.get('image'))
+        try:
+            item = PlaylistVideo.objects.get(pk=pk)
+        except PlaylistVideo.DoesNotExist:
+            return Response(status=404)
+        serializer = PlaylistVideoSerializerUpdate(item, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+
+    def delete(self, request, pk, format=None):
+        try:
+            item = PlaylistVideo.objects.get(pk= pk)
+        except PlaylistVideo.DoesNotExist:
+            return Response(status=404)
+        item.delete()
+        return Response(status=204)
+
 
 class TagViewset(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
@@ -93,11 +145,7 @@ class TagViewset(viewsets.ModelViewSet):
 
 class TagDetailViewset(viewsets.ModelViewSet):
     queryset = TagDetail.objects.all()
-    serializer_class =  TagDetailSerializer
-
-class PlaylistVideoViewset(viewsets.ModelViewSet):
-    queryset = PlaylistVideo.objects.all()
-    serializer_class = PlaylistVideoSerializer
+    serializer_class = TagDetailSerializer
 
 class UserDetailViewset(viewsets.ModelViewSet):
     queryset = UserDetail.objects.all()
@@ -118,3 +166,7 @@ class ChallengeViewset(viewsets.ModelViewSet):
 class ViewHistoryViewset(viewsets.ModelViewSet):
     queryset = ViewHistory.objects.all()
     serializer_class = ViewHistorySerializer
+
+class UserTestViewset(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class =  UserTestSerializer

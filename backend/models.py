@@ -48,6 +48,7 @@ class Video(models.Model):
 class PlaylistVideo(models.Model):
     image = models.FileField(upload_to='images', null=True, verbose_name="Playlist Image")
     name = models.CharField(max_length=255)
+    description = models.CharField(max_length=5500, null=True, blank=True, default='None description.')
     video = models.ManyToManyField(Video, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
@@ -65,7 +66,9 @@ class ViewHistory(models.Model):
 class Challenge(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(max_length=2500, null=True, blank=True, default='No description')
-    image = models.FileField(upload_to='challenge_image', verbose_name='Challenge Image')
+    image = models.FileField(upload_to='challenge_image', verbose_name='Challenge Image',null=True, blank=True)
+    video =models.FileField(upload_to='challenge_video', verbose_name='Challenge Video', null=True, blank=True)
+    imageChallenge = models.FileField(upload_to='challenge', verbose_name='Challenge', null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE) 
     def __str__(self):
         return '{}'.format(self.name)

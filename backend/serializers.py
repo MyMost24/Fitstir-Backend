@@ -4,6 +4,12 @@ from django.db import models
 from rest_framework import serializers
 from django.contrib.auth.models import User
 
+class PermissionSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = User
+    fields = ['is_active','is_staff','is_superuser']
+
+
 
 class UserDetailSerializer(ModelSerializer):
     class Meta:
@@ -16,7 +22,13 @@ class UserSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'email', 'userdetail']
+        fields = ['id', 'first_name', 'last_name', 'username', 'password', 'email', 'userdetail']
+
+class UserTestSerializer(ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = '__all__'
 
 
 class TagDetailSerializer(ModelSerializer):
@@ -53,13 +65,13 @@ class VideoViewSerializer(ModelSerializer):
 class VideoSerializerUpdate(ModelSerializer):
     class Meta:
         model = Video
-        fields = ['title', 'description', 'tags']
+        fields = ['name', 'description', 'tag_type', 'image']
 
 
 class VideoSerializerUpdateView(ModelSerializer):
     class Meta:
         model = Video
-        fields = ['title', 'description', 'tags', 'image']
+        fields = ['name', 'description', 'tag_type', 'image']
 
 
 class PlaylistVideoSerializer(ModelSerializer):
@@ -68,6 +80,10 @@ class PlaylistVideoSerializer(ModelSerializer):
         model = PlaylistVideo
         fields = '__all__'
 
+class PlaylistVideoSerializerUpdate(ModelSerializer):
+    class Meta:
+        model = PlaylistVideo
+        fields = ['name', 'image', 'description']
 
 
 class ViewHistorySerializer(ModelSerializer):
