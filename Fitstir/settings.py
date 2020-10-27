@@ -41,10 +41,14 @@ INSTALLED_APPS = [
     'polymorphic',
     'django_filters',
     'simple_history',
+    'django.contrib.sites',
     'rest_auth',
+    'allauth',
+    'allauth.account',
+    'rest_auth.registration',
 
 ]
-
+SITE = 1
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework.authentication.TokenAuthentication'],
