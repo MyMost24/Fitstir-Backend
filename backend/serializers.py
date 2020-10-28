@@ -3,32 +3,57 @@ from backend.models import UserDetail, Tag, TagDetail, Video, PlaylistVideo, Vie
 from django.db import models
 from rest_framework import serializers
 from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
+from rest_auth.registration.serializers import RegisterSerializer
+from rest_auth.registration.views import RegisterView
+from django.views.decorators.csrf import csrf_exempt
+
+
+
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    """
+    Serializer for password change endpoint.
+    """
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+
+    def validate_new_password(self, value):
+        validate_password(value)
+        return value
+
 
 class PermissionSerializer(serializers.ModelSerializer):
   class Meta:
     model = User
-    fields = ['is_active','is_staff','is_superuser']
+    fields = ['is_active', 'is_staff', 'is_superuser']
 
-
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'image', 'first_name', 'last_name', 'email', 'is_staff']
 
 class UserDetailSerializer(ModelSerializer):
+    user = UserSerializer(read_only=True)
     class Meta:
         model = UserDetail
         fields = '__all__'
 
 
-class UserSerializer(ModelSerializer):
-    userdetail = UserDetailSerializer(read_only=True)
-
+class UserDetailViewSerializer(ModelSerializer):
     class Meta:
-        model = User
-        fields = ['id', 'first_name', 'last_name', 'username', 'password', 'email', 'userdetail']
-
-class UserTestSerializer(ModelSerializer):
-
-    class Meta:
-        model = User
+        model = UserDetail
         fields = '__all__'
+
+
+class UserViewSerializer(ModelSerializer):
+    userdetail = UserDetailViewSerializer(read_only=True)
+
+    class Meta:
+        model = User
+        fields = ['id', 'first_name', 'last_name', 'email', 'userdetail']
+
 
 
 class TagDetailSerializer(ModelSerializer):
@@ -68,14 +93,14 @@ class VideoSerializerUpdate(ModelSerializer):
         fields = ['name', 'description', 'tag_type', 'image']
 
 
-class VideoSerializerUpdateView(ModelSerializer):
-    class Meta:
-        model = Video
-        fields = ['name', 'description', 'tag_type', 'image']
 
-
-class PlaylistVideoSerializer(ModelSerializer):
+class PlaylistVideoSerializerView(ModelSerializer):
     video = VideoSerializer(read_only=True, many=True)
+    class Meta:
+        model = PlaylistVideo
+        fields = '__all__'
+
+class PlalistVideoSerializer(ModelSerializer):
     class Meta:
         model = PlaylistVideo
         fields = '__all__'
