@@ -109,7 +109,7 @@ class PlaylistVideoSerializer(ModelSerializer):
 class PlaylistVideoSerializerUpdate(ModelSerializer):
     class Meta:
         model = PlaylistVideo
-        fields = ['name', 'image', 'description']
+        fields = ['id', 'name', 'image', 'description']
 
 class InPlaylistSerializer(ModelSerializer):
     class Meta:

@@ -30,6 +30,7 @@ urlpatterns = [
     path('playlist/', views.PlaylistVideoCreateAPIView.as_view()),
     path('playlist/<int:pk>', views.PlaylistVideoAPIViewUpdate.as_view()),
     path('videoplaylist/', views.PlaylistAPIView.as_view()),
+    path('videoplaylist/<int:pk>', views.InPlaylistAPIViewUpdeta.as_view()),
     path('userplaylist/<int:pk>', views.PlaylistVideoGetByUserIdAPIView.as_view()),
     path('adminplaylist/', views.PlaylistVideoGetByStaffAPIView.as_view()),
     path('challenge/', views.ChallengeAIPView.as_view()),

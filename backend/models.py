@@ -68,7 +68,7 @@ class Challenge(models.Model):
     description = models.TextField(max_length=2500, null=True, blank=True, default='No description')
     image = models.FileField(upload_to='challenge_image', verbose_name='Challenge Image',null=True, blank=True)
     video = models.FileField(upload_to='challenge_video', verbose_name='Challenge Video', null=True, blank=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE) 
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     def __str__(self):
         return '{}'.format(self.name)
 

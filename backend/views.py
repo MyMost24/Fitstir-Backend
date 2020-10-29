@@ -269,7 +269,7 @@ class PlaylistVideoAPIViewUpdate(generics.RetrieveUpdateDestroyAPIView):
 
     @csrf_exempt
     def put(self, request, pk, format=None):
-        request.data['image'] = convertImagetofile(request.data.get('image'))
+        # request.data['image'] = convertImagetofile(request.data.get('image'))
         try:
             item = PlaylistVideo.objects.get(pk=pk)
         except PlaylistVideo.DoesNotExist:
