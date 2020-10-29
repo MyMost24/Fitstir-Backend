@@ -21,7 +21,7 @@ from .serializers import VideoSerializer, VideoViewSerializer, VideoSerializerUp
     PlaylistVideoSerializer, InPlaylistSerializer, InPlaylistSeializerView, \
     ChallengeSerializerView, CommentSerializer, ChangePasswordSerializer, \
     UserViewSerializer, UserDetailViewSerializer, UserDetailSerializer, UserSerializer, \
-    UserUpdateSerailizer, InChallengeSerailizer, InChallengeSerializerView
+    UserUpdateSerailizer, InChallengeSerailizer, InChallengeSerializerView, ChallengeSerializer
 
 from .models import Video, Tag, PlaylistVideo, TagDetail, UserDetail, Comment, Challenge, InPlaylist, InChallenge
 
@@ -309,7 +309,60 @@ class ChallengeViewset(viewsets.ModelViewSet):
     serializer_class = ChallengeSerializerView
 
 
-class ChallengeAIPView(APIView):
+class ChallengeAPIView(APIView):
+    def get(self, rquest, format=None):
+        item = Challenge.objects.all()
+        serializer = ChallengeSerializer(item, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        form = {
+            "name": request.data.get('name', ),
+            "description": request.data.get('description', ),
+            "image": request.data.get('image', ),
+            "video": request.data.get('video', ),
+            "user": request.data.get('user', ),
+        }
+        serializer = ChallengeSerializer(data=form)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
+
+class ChallengeAPIViewUpdate(APIView):
+    def get(self, request, pk, fotmat=None):
+        try:
+            item = Challenge.objects.get(pk=pk)
+            serializer = ChallengeSerializer(item)
+            return Response(serializer.data)
+        except InChallenge.DoesNotExist:
+            return Response(status=404)
+
+    @csrf_exempt
+    def put(self, request, pk, format=None):
+        # request.data['image'] = convertImagetofile(request.data.get('image'))
+        try:
+            item = Challenge.objects.get(pk=pk)
+        except Challenge.DoesNotExist:
+            return Response(status=404)
+        serializer = ChallengeSerializer(item, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+
+    def delete(self, request, pk, format=None):
+
+        try:
+            item = Challenge.objects.get(pk=pk)
+        except Challenge.DoesNotExist:
+            return Response(status=404)
+        item.delete()
+        return Response(status=204)
+
+
+class InChallengeAPIView(APIView):
     def get(self, request, format=None):
         item = InChallenge.objects.all()
         serializer = InChallengeSerializerView(item, many=True)
@@ -317,7 +370,7 @@ class ChallengeAIPView(APIView):
 
     def post(self, request, format=None):
         form = {
-            "comment": request.data.get('comnnet', ),
+            "comment": request.data.get('commnet', ),
             "challenge": request.data.get('challenge', ),
         }
         serializer = InChallengeSerailizer(data=form)
@@ -326,8 +379,9 @@ class ChallengeAIPView(APIView):
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
-class ChallengeAIPViewUpdate(APIView):
-    def get(self, request, pk, format=None ):
+
+class InChallengeAPIViewUpdate(APIView):
+    def get(self, request, pk, format=None):
         try:
             item = InChallenge.objects.get(challenge=pk)
             serializer = InChallengeSerializerView(item)
@@ -343,7 +397,6 @@ class ChallengeAIPViewUpdate(APIView):
             return Response(status=404)
         item.delete()
         return Response(status=204)
-
 
 # class ViewHistoryViewset(viewsets.ModelViewSet):
 #     queryset = ViewHistory.objects.all()

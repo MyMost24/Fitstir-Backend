@@ -33,8 +33,10 @@ urlpatterns = [
     path('videoplaylist/<int:pk>', views.InPlaylistAPIViewUpdeta.as_view()),
     path('userplaylist/<int:pk>', views.PlaylistVideoGetByUserIdAPIView.as_view()),
     path('adminplaylist/', views.PlaylistVideoGetByStaffAPIView.as_view()),
-    path('challenge/', views.ChallengeAIPView.as_view()),
-    path('challenge/<int:pk>', views.ChallengeAIPViewUpdate.as_view()),
+    path('challenge/', views.ChallengeAPIView.as_view()),
+    path('challenge/<int:pk>', views.ChallengeAPIViewUpdate.as_view()),
+    path('inchallenge/', views.InChallengeAPIView.as_view()),
+    path('inchallenge/<int:pk>', views.InChallengeAPIViewUpdate.as_view()),
 
     # path('videos', views.VideoAPIListView.as_view()),
 

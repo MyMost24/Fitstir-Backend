@@ -130,6 +130,7 @@ class CommentSerializer(ModelSerializer):
 
 
 class ChallengeSerializerView(ModelSerializer):
+    user = UserUpdateSerailizer(read_only=True)
     comment = CommentSerializer(read_only=True)
     class Meta:
         model = Challenge
