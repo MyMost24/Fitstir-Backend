@@ -85,3 +85,8 @@ class Comment(models.Model):
 class InPlaylist(models.Model):
     video = models.ForeignKey(Video, on_delete=models.CASCADE)
     playlist = models.ForeignKey(PlaylistVideo, on_delete=models.CASCADE)
+
+
+class InChallenge(models.Model):
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
+    challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE)

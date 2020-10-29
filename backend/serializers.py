@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer
-from backend.models import UserDetail, Tag, TagDetail, Video, PlaylistVideo, Comment, Challenge,InPlaylist
+from backend.models import UserDetail, Tag, TagDetail, Video, PlaylistVideo, Comment, Challenge, InPlaylist, InChallenge
 from django.db import models
 from rest_framework import serializers
 from django.contrib.auth.models import User
@@ -123,6 +123,36 @@ class InPlaylistSeializerView(ModelSerializer):
         fields = '__all__'
 
 
+class CommentSerializer(ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = '__all__'
+
+
+class ChallengeSerializerView(ModelSerializer):
+    comment = CommentSerializer(read_only=True)
+    class Meta:
+        model = Challenge
+        fields = '__all__'
+
+class ChallengeSerializer(ModelSerializer):
+    class Meta:
+        model = Challenge
+        fields = '__all__'
+
+class InChallengeSerailizer(ModelSerializer):
+    class Meta:
+        model = InPlaylist
+        fields = '__all__'
+
+class InChallengeSerializerView(ModelSerializer):
+    challenge = ChallengeSerializer(read_only=True)
+    comment = CommentSerializer(read_only=True)
+    class Meta:
+        model = InChallenge
+        fields = '__all__'
+
+
 # class ViewHistorySerializer(ModelSerializer):
 #     video = VideoSerializer(read_only=True)
 #     user = UserSerializer(read_only=True)
@@ -130,17 +160,3 @@ class InPlaylistSeializerView(ModelSerializer):
 #     class Meta:
 #         model = ViewHistory
 #         fields = '__all__'
-
-
-class CommentSerializer(ModelSerializer):
-    class Meta:
-        model = Comment
-        fields = '__all__'
-
-
-class ChallengeSerializer(ModelSerializer):
-    comment = CommentSerializer(read_only=True)
-
-    class Meta:
-        model = Challenge
-        fields = '__all__'

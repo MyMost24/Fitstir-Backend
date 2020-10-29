@@ -11,9 +11,8 @@ router.register('videos', views.VideoViewset)
 router.register('tag', views.TagViewset)
 router.register('tagdetail', views.TagDetailViewset)
 router.register('playlists', views.PlaylistVideoViewset)
-# router.register('challenge', views.ChallengeViewset)
-# router.register('comment', views.CommentViewset)
-# router.register('user', views.UserViewViewset)
+router.register('challenges', views.ChallengeViewset)
+router.register('comments', views.CommentViewset)
 router.register('userdetail', views.UserDetailViewViewset)
 
 
@@ -33,6 +32,8 @@ urlpatterns = [
     path('videoplaylist/', views.PlaylistAPIView.as_view()),
     path('userplaylist/<int:pk>', views.PlaylistVideoGetByUserIdAPIView.as_view()),
     path('adminplaylist/', views.PlaylistVideoGetByStaffAPIView.as_view()),
+    path('challenge/', views.ChallengeAIPView.as_view()),
+    path('challenge/<int:pk>', views.ChallengeAIPViewUpdate.as_view()),
 
     # path('videos', views.VideoAPIListView.as_view()),
 

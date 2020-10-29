@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from simple_history.admin import SimpleHistoryAdmin
 from polymorphic.admin import PolymorphicParentModelAdmin, PolymorphicChildModelAdmin, inlines
-from backend.models import Tag, Video, TagDetail, UserDetail, Challenge, PlaylistVideo, Comment, InPlaylist
+from backend.models import Tag, Video, TagDetail, UserDetail, Challenge, PlaylistVideo, Comment, InPlaylist, InChallenge
 
 
 
@@ -52,5 +52,6 @@ admin.site.register(UserDetail, SimpleHistoryAdmin)
 admin.site.register(TagDetail, TagDetailAdmin)
 admin.site.register(Comment)
 admin.site.register(InPlaylist)
+admin.site.register(InChallenge)
 
 
