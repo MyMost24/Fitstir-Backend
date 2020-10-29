@@ -241,8 +241,8 @@ class PlaylistAPIView(APIView):
 class InPlaylistAPIViewUpdeta(APIView):
     def get(self, request, pk, format=None):
         try:
-            item = InPlaylist.objects.get(pk=pk)
-            serializer = InPlaylistSerializer(item)
+            item = InPlaylist.objects.filter(playlist=pk)
+            serializer = InPlaylistSeializerView(item)
             return Response(serializer.data)
         except InPlaylist.DoesNotExist:
             return Response(status=404)
@@ -329,8 +329,8 @@ class ChallengeAIPView(APIView):
 class ChallengeAIPViewUpdate(APIView):
     def get(self, request, pk, format=None ):
         try:
-            item = InChallenge.objects.get(pk=pk)
-            serializer = InChallengeSerailizer(item)
+            item = InChallenge.objects.get(challenge=pk)
+            serializer = InChallengeSerializerView(item)
             return Response(serializer.data)
         except InChallenge.DoesNotExist:
             return Response(status=404)
