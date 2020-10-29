@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer
-from backend.models import UserDetail, Tag, TagDetail, Video, PlaylistVideo, ViewHistory, Comment, Challenge
+from backend.models import UserDetail, Tag, TagDetail, Video, PlaylistVideo, Comment, Challenge,InPlaylist
 from django.db import models
 from rest_framework import serializers
 from django.contrib.auth.models import User
@@ -24,15 +24,16 @@ class ChangePasswordSerializer(serializers.Serializer):
         return value
 
 
-class PermissionSerializer(serializers.ModelSerializer):
-  class Meta:
-    model = User
-    fields = ['is_active', 'is_staff', 'is_superuser']
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'image', 'first_name', 'last_name', 'email', 'is_staff']
+        fields = ['id', 'first_name', 'last_name', 'email', 'username', 'password', 'is_active']
+
+class UserUpdateSerailizer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'first_name', 'last_name', 'email']
 
 class UserDetailSerializer(ModelSerializer):
     user = UserSerializer(read_only=True)
@@ -52,7 +53,7 @@ class UserViewSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'email', 'userdetail']
+        fields = ['id', 'first_name', 'last_name', 'email', 'is_staff', 'is_active', 'userdetail']
 
 
 
@@ -100,7 +101,7 @@ class PlaylistVideoSerializerView(ModelSerializer):
         model = PlaylistVideo
         fields = '__all__'
 
-class PlalistVideoSerializer(ModelSerializer):
+class PlaylistVideoSerializer(ModelSerializer):
     class Meta:
         model = PlaylistVideo
         fields = '__all__'
@@ -110,14 +111,25 @@ class PlaylistVideoSerializerUpdate(ModelSerializer):
         model = PlaylistVideo
         fields = ['name', 'image', 'description']
 
-
-class ViewHistorySerializer(ModelSerializer):
-    video = VideoSerializer(read_only=True)
-    user = UserSerializer(read_only=True)
-
+class InPlaylistSerializer(ModelSerializer):
     class Meta:
-        model = ViewHistory
+        model =InPlaylist
         fields = '__all__'
+
+class InPlaylistSeializerView(ModelSerializer):
+    video = VideoSerializer(read_only=True)
+    class Meta:
+        model = InPlaylist
+        fields = '__all__'
+
+
+# class ViewHistorySerializer(ModelSerializer):
+#     video = VideoSerializer(read_only=True)
+#     user = UserSerializer(read_only=True)
+#
+#     class Meta:
+#         model = ViewHistory
+#         fields = '__all__'
 
 
 class CommentSerializer(ModelSerializer):

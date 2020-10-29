@@ -17,12 +17,13 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 from .serializers import VideoSerializer, VideoViewSerializer, VideoSerializerUpdate, \
-    TagSerializer, TagDetailSerializer, PlaylistVideoSerializerUpdate, PlaylistVideoSerializerView, PlalistVideoSerializer, \
-     ViewHistorySerializer, ChallengeSerializer, CommentSerializer, PermissionSerializer,  \
-    ChangePasswordSerializer, UserViewSerializer, UserDetailViewSerializer, UserDetailSerializer, UserSerializer
+    TagSerializer, TagDetailSerializer, PlaylistVideoSerializerUpdate, PlaylistVideoSerializerView, \
+    PlaylistVideoSerializer, InPlaylistSerializer,InPlaylistSeializerView, \
+    ChallengeSerializer, CommentSerializer, ChangePasswordSerializer, \
+    UserViewSerializer, UserDetailViewSerializer, UserDetailSerializer, UserSerializer, \
+    UserUpdateSerailizer
 
-
-from .models import Video, Tag, PlaylistVideo, TagDetail, UserDetail, Comment, Challenge, ViewHistory
+from .models import Video, Tag, PlaylistVideo, TagDetail, UserDetail, Comment, Challenge,InPlaylist
 
 
 class ChangePassword(APIView):
@@ -61,20 +62,56 @@ class UpdatePassword(APIView):
         return Response(serializer.errors, status=400)
 
 
-class Permission(APIView):
+class UserAPIView(APIView):
+    def get(self, request, format=None):
+        items = User.objects.filter(is_active=True, is_staff=False)
+        serializer = UserViewSerializer(items, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        form = {
+            "first_name": request.data.get('first_name', ),
+            "last_name": request.data.get('last_name', ),
+            "email": request.data.get('email', ),
+            "username": request.data.get('username', ),
+            "password": request.data.get('password', ),
+            "is_active": request.data.get('is_active', ),
+        }
+        serializer = UserSerializer(data=form)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
+
+class UserUpdateAPIView(APIView):
     def get(self, request, pk, format=None):
         try:
             item = User.objects.get(pk=pk)
-            serializer = PermissionSerializer(item)
+            serializer = UserUpdateSerailizer(item)
             return Response(serializer.data)
         except User.DoesNotExist:
             return Response(status=404)
-        return Response({"hello": "asd"})
 
+    @csrf_exempt
+    def put(self, request, pk, format=None):
+        try:
+            item = User.objects.get(pk=pk)
+        except User.DoesNotExist:
+            return Response(status=404)
+        serializer = UserUpdateSerailizer(item, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
 
-class UserViewViewset(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserViewSerializer
+    def delete(self, request, pk, format=None):
+        try:
+            item = User.objects.get(pk=pk)
+        except User.DoesNotExist:
+            return Response(status=404)
+        item.delete()
+        return Response(status=204)
 
 
 class UserDetailViewViewset(viewsets.ModelViewSet):
@@ -158,9 +195,14 @@ class PlaylistVideoGetByUserIdAPIView(APIView):
         return Response(serializer.data)
 
 
+class PlaylistVideoGetByStaffAPIView(APIView):
+    def get(self, request):
+        items = PlaylistVideo.objects.filter(user__is_staff=True)
+        serializer = PlaylistVideoSerializerView(items, many=True)
+        return Response(serializer.data)
+
+
 class PlaylistVideoCreateAPIView(APIView):
-    def get(self, request, pk, format=None):
-        return Response({"hello": pk})
 
     def post(self, request, format=None):
         form = {
@@ -170,11 +212,31 @@ class PlaylistVideoCreateAPIView(APIView):
             "user": request.data.get('user', ),
         }
 
-        serializer = PlalistVideoSerializer(data=form)
+        serializer = PlaylistVideoSerializer(data=form)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
+
+
+class PlaylistAPIView(APIView):
+
+    def get(self, request, format=None):
+        item = InPlaylist.objects.all()
+        serializer = InPlaylistSeializerView(item, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        form = {
+            "video": request.data.get('video', ),
+            "playlist": request.data.get('playlist', ),
+        }
+        serializer = InPlaylistSerializer(data=form)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
 
 
 class PlaylistVideoAPIViewUpdate(generics.RetrieveUpdateDestroyAPIView):
@@ -228,7 +290,6 @@ class ChallengeViewset(viewsets.ModelViewSet):
     queryset = Challenge.objects.all()
     serializer_class = ChallengeSerializer
 
-
-class ViewHistoryViewset(viewsets.ModelViewSet):
-    queryset = ViewHistory.objects.all()
-    serializer_class = ViewHistorySerializer
+# class ViewHistoryViewset(viewsets.ModelViewSet):
+#     queryset = ViewHistory.objects.all()
+#     serializer_class = ViewHistorySerializer
