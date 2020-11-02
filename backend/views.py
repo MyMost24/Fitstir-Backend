@@ -69,6 +69,7 @@ class UserAPIView(APIView):
         return Response(serializer.data)
 
     def post(self, request, format=None):
+
         form = {
             "first_name": request.data.get('first_name', ),
             "last_name": request.data.get('last_name', ),
@@ -77,6 +78,8 @@ class UserAPIView(APIView):
             "password": request.data.get('password', ),
             "is_active": request.data.get('is_active', ),
         }
+
+
         serializer = UserSerializer(data=form)
         if serializer.is_valid():
             serializer.save()
@@ -163,7 +166,7 @@ class VideoAPIViewUpdate(generics.RetrieveUpdateDestroyAPIView):
 
     @csrf_exempt
     def put(self, request, pk, format=None):
-        request.data['image'] = convertImagetofile(request.data.get('image'))
+        # request.data['image'] = convertImagetofile(request.data.get('image'))
         try:
             item = Video.objects.get(pk=pk)
         except Video.DoesNotExist:
@@ -242,7 +245,7 @@ class InPlaylistAPIViewUpdeta(APIView):
     def get(self, request, pk, format=None):
         try:
             item = InPlaylist.objects.filter(playlist=pk)
-            serializer = InPlaylistSeializerView(item)
+            serializer = InPlaylistSeializerView(item, many=True)
             return Response(serializer.data)
         except InPlaylist.DoesNotExist:
             return Response(status=404)
@@ -361,6 +364,26 @@ class ChallengeAPIViewUpdate(APIView):
         item.delete()
         return Response(status=204)
 
+# class CommentAPIView(APIView):
+#     def get(self, rquest, format=None):
+#         item = Challenge.objects.all()
+#         serializer = ChallengeSerializer(item, many=True)
+#         return Response(serializer.data)
+#
+#     def post(self, request, format=None):
+#         form = {
+#             "name": request.data.get('name', ),
+#             "description": request.data.get('description', ),
+#             "image": request.data.get('image', ),
+#             "video": request.data.get('video', ),
+#             "user": request.data.get('user', ),
+#         }
+#         serializer = ChallengeSerializer(data=form)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=201)
+#         return Response(serializer.errors, status=400)
+
 
 class InChallengeAPIView(APIView):
     def get(self, request, format=None):
@@ -383,8 +406,8 @@ class InChallengeAPIView(APIView):
 class InChallengeAPIViewUpdate(APIView):
     def get(self, request, pk, format=None):
         try:
-            item = InChallenge.objects.get(challenge=pk)
-            serializer = InChallengeSerializerView(item)
+            item = InChallenge.objects.filter(challenge=pk)
+            serializer = InChallengeSerializerView(item, many=True)
             return Response(serializer.data)
         except InChallenge.DoesNotExist:
             return Response(status=404)

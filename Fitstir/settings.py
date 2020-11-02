@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'rest_registration',
     'rest_framework.authtoken',
 
+
 ]
 SITE_ID = 1
 REST_FRAMEWORK = {
@@ -72,6 +73,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'Fitstir.urls'
+REGISTRATION_API_ACTIVATION_SUCCESS_URL = '/'
 
 TEMPLATES = [
     {
@@ -147,4 +149,5 @@ REST_REGISTRATION = {
     'RESET_PASSWORD_VERIFICATION_URL': 'https://frontend-host/reset-password/',
     'REGISTER_EMAIL_VERIFICATION_URL': 'https://frontend-host/verify-email/',
     'VERIFICATION_FROM_EMAIL': 'no-reply@example.com',
+    'REGISTER_VERIFICATION_ENABLED' : False
 }

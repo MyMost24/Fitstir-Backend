@@ -46,7 +46,7 @@ class Video(models.Model):
 
 
 class PlaylistVideo(models.Model):
-    image = models.FileField(upload_to='images', null=True, verbose_name="Playlist Image")
+    image = models.FileField(upload_to='images', null=True, blank=True, verbose_name="Playlist Image")
     name = models.CharField(max_length=255)
     description = models.CharField(max_length=5500, null=True, blank=True, default='None description.')
     video = models.ManyToManyField(Video, null=True, blank=True)
@@ -55,19 +55,21 @@ class PlaylistVideo(models.Model):
     def __str__(self):
         return '{}'.format(self.name)
 
+class InPlaylist(models.Model):
+    video = models.ForeignKey(Video, on_delete=models.CASCADE)
+    playlist = models.ForeignKey(PlaylistVideo, on_delete=models.CASCADE)
+    def __str__(self):
+        return '{},{}'.format(self.video, self.playlist)
 
-# class ViewHistory(models.Model):
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     video = models.ForeignKey(Video, on_delete=models.CASCADE)
-#     create_at = models.DateTimeField(auto_now_add=True)
+
+
 
 
 
 class Challenge(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(max_length=2500, null=True, blank=True, default='No description')
-    image = models.FileField(upload_to='challenge_image', verbose_name='Challenge Image',null=True, blank=True)
-    video = models.FileField(upload_to='challenge_video', verbose_name='Challenge Video', null=True, blank=True)
+    image = models.FileField(upload_to='challenge_image', verbose_name='Challenge Image', null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     def __str__(self):
         return '{}'.format(self.name)
@@ -76,17 +78,14 @@ class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE)
     commentText = models.CharField(max_length=500, null=True, blank=True, default='Comment')
-    commentVideo = models.FileField(upload_to='challenge_videos', null=True, blank=True)
-    commentImage = models.FileField(upload_to='challenge_video_image', null=True, blank=True)
 
     def __str__(self):
         return '{},{},{}'.format(self.user.username, self.challenge, self.commentText)
 
-class InPlaylist(models.Model):
-    video = models.ForeignKey(Video, on_delete=models.CASCADE)
-    playlist = models.ForeignKey(PlaylistVideo, on_delete=models.CASCADE)
 
 
 class InChallenge(models.Model):
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
     challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE)
+    def __str__(self):
+        return '{},{}'.format(self.comment, self.challenge)

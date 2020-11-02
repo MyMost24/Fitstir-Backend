@@ -26,9 +26,26 @@ class ChangePasswordSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
         fields = ['id', 'first_name', 'last_name', 'email', 'username', 'password', 'is_active']
+
+        def create(self, validated_data):
+            user = User(
+                username=validated_data['username'],
+                first_name=validated_data['first_name'],
+                last_name=validated_data['last_name'],
+                email=validated_data['email'],
+                is_active=validated_data['is_active'],
+            )
+            user.set_password(validated_data['password'])
+            user.save()
+            return user
+
+
+
+
 
 class UserUpdateSerailizer(serializers.ModelSerializer):
     class Meta:
@@ -122,6 +139,11 @@ class InPlaylistSeializerView(ModelSerializer):
         model = InPlaylist
         fields = '__all__'
 
+class CommentSerializerView(ModelSerializer):
+    user = UserUpdateSerailizer(read_only=True)
+    class Meta:
+        model= Comment
+        fields = '__all__'
 
 class CommentSerializer(ModelSerializer):
     class Meta:
@@ -147,8 +169,8 @@ class InChallengeSerailizer(ModelSerializer):
         fields = '__all__'
 
 class InChallengeSerializerView(ModelSerializer):
-    challenge = ChallengeSerializer(read_only=True)
-    comment = CommentSerializer(read_only=True)
+    challenge = ChallengeSerializerView(read_only=True)
+    comment = CommentSerializerView(read_only=True)
     class Meta:
         model = InChallenge
         fields = '__all__'
