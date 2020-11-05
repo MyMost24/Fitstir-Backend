@@ -63,9 +63,6 @@ class InPlaylist(models.Model):
 
 
 
-
-
-
 class Challenge(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(max_length=2500, null=True, blank=True, default='No description')
@@ -74,18 +71,33 @@ class Challenge(models.Model):
     def __str__(self):
         return '{}'.format(self.name)
 
+class VideoChallenge(models.Model):
+    video = models.FileField(upload_to='challenge_video', verbose_name='Challenge Video')
+    image = models.FileField(upload_to='challenge_image', verbose_name='Challenge Video Challenge')
+    description = models.TextField(max_length=5500, null=True, blank=True)
+    challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+
 class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE)
+    video = models.ForeignKey(VideoChallenge, on_delete=models.CASCADE)
     commentText = models.CharField(max_length=500, null=True, blank=True, default='Comment')
 
+
     def __str__(self):
-        return '{},{},{}'.format(self.user.username, self.challenge, self.commentText)
-
-
+        return '{},{}'.format(self.user.username, self.commentText)
 
 class InChallenge(models.Model):
-    comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
     challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE)
+    video = models.ForeignKey(VideoChallenge, on_delete=models.CASCADE)
+
     def __str__(self):
-        return '{},{}'.format(self.comment, self.challenge)
+        return '{},{}'.format(self.video, self.challenge)
+
+
+class InVideoChallenge(models.Model):
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
+    video = models.ForeignKey(VideoChallenge, on_delete=models.CASCADE)
+    def __str__(self):
+        return '{},{}'.format(self.comment, self.video)

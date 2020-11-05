@@ -19,11 +19,19 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import VideoSerializer, VideoViewSerializer, VideoSerializerUpdate, \
     TagSerializer, TagDetailSerializer, PlaylistVideoSerializerUpdate, PlaylistVideoSerializerView, \
     PlaylistVideoSerializer, InPlaylistSerializer, InPlaylistSeializerView, \
-    ChallengeSerializerView, CommentSerializer, ChangePasswordSerializer, \
-    UserViewSerializer, UserDetailViewSerializer, UserDetailSerializer, UserSerializer, \
-    UserUpdateSerailizer, InChallengeSerailizer, InChallengeSerializerView, ChallengeSerializer
+    CommentSerializer, ChangePasswordSerializer, UserViewSerializer, UserDetailViewSerializer, \
+    UserDetailSerializer, UserSerializer, UserUpdateSerailizer, CommentSerializerView, CommentSerializer, \
+    ChallengeSerializer, ChallengeViewSerializer, VideoChallengeSerializer, VideoChallengeViewSerializer, \
+    InChallengeSerializer, InVideoChallengeSerializer, InVideoChallengeViewSerializer, InChallengeViewSerializer
 
-from .models import Video, Tag, PlaylistVideo, TagDetail, UserDetail, Comment, Challenge, InPlaylist, InChallenge
+from .models import Video, Tag, PlaylistVideo, TagDetail, UserDetail, Comment, Challenge, InPlaylist, InChallenge, VideoChallenge, InVideoChallenge
+
+
+def convertImagetofile(img):
+    format, imgstr = img.split(';base64,')
+    ext = format.split('/')[-1]
+    image_name = str(uuid.uuid4()) + "." + ext
+    return ContentFile(base64.b64decode(imgstr), image_name)
 
 
 class ChangePassword(APIView):
@@ -68,23 +76,21 @@ class UserAPIView(APIView):
         serializer = UserViewSerializer(items, many=True)
         return Response(serializer.data)
 
+
+class AdminAPIView(APIView):
+    def get(self, request, format=None):
+        items = User.objects.filter(is_staff=True)
+        serializer = UserViewSerializer(items, many=True)
+        return Response(serializer.data)
+
+
+class ChangeToAdmin(APIView):
     def post(self, request, format=None):
-
-        form = {
-            "first_name": request.data.get('first_name', ),
-            "last_name": request.data.get('last_name', ),
-            "email": request.data.get('email', ),
-            "username": request.data.get('username', ),
-            "password": request.data.get('password', ),
-            "is_active": request.data.get('is_active', ),
-        }
-
-
-        serializer = UserSerializer(data=form)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
+        user = User.objects.get(request.data.get('user'))
+        user.is_staff = True
+        user.is_active = False
+        user.save()
+        return Response({"success": "GG"})
 
 
 class UserUpdateAPIView(APIView):
@@ -116,17 +122,51 @@ class UserUpdateAPIView(APIView):
         item.delete()
         return Response(status=204)
 
+class UserProfileAPIView(APIView):
+    def post(self, request, format=None):
+        form = {
+
+            "name": request.data.get('name', ),
+            "birthday": request.data.get('birthday', ),
+            "phone_number": request.data.get('phone_number', ),
+            "address": request.data.get('address', ),
+            "high": request.data.get('high', ),
+            "weight": request.data.get('weight', ),
+            "bmi": request.data.get('bmi', ),
+            "user": request.data.get('user', ),
+
+        }
+        serializer = UserDetailSerializer(data=form)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
+class UserProfileAPIViewUpdate(APIView):
+    def get(self, request, pk, format=None):
+        try:
+            item = UserDetail.objects.filter(user=pk)
+            serializer = UserDetailSerializer(item)
+            return Response(serializer.data)
+        except UserDetail.DoesNotExist:
+            return Response(status=404)
+
+    def put(self, request, pk, format=None):
+        try:
+            item = UserDetail.objects.get(pk=pk)
+        except UserDetail.DoesNotExist:
+            return Response(status=404)
+        serializer = UserDetailSerializer(item, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+
+
 
 class UserDetailViewViewset(viewsets.ModelViewSet):
     queryset = UserDetail.objects.all()
     serializer_class = UserDetailViewSerializer
-
-
-def convertImagetofile(img):
-    format, imgstr = img.split(';base64,')
-    ext = format.split('/')[-1]
-    image_name = str(uuid.uuid4()) + "." + ext
-    return ContentFile(base64.b64decode(imgstr), image_name)
 
 
 class VideoViewset(viewsets.ModelViewSet):
@@ -166,12 +206,20 @@ class VideoAPIViewUpdate(generics.RetrieveUpdateDestroyAPIView):
 
     @csrf_exempt
     def put(self, request, pk, format=None):
-        # request.data['image'] = convertImagetofile(request.data.get('image'))
+        request.data['image'] = convertImagetofile(request.data.get('image'))
+        tags = list(map(int, request.data.get('tag_type', ).split(',')))
+        form = {
+            "tag_type": tags,
+            "name": request.data.get('name', ),
+            "image": request.data.get('image', ),
+            "description": request.data.get('description', ),
+
+        }
         try:
             item = Video.objects.get(pk=pk)
         except Video.DoesNotExist:
             return Response(status=404)
-        serializer = VideoSerializerUpdate(item, data=request.data)
+        serializer = VideoSerializerUpdate(item, data=form)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -302,28 +350,17 @@ class TagDetailViewset(viewsets.ModelViewSet):
     serializer_class = TagDetailSerializer
 
 
-class CommentViewset(viewsets.ModelViewSet):
-    queryset = Comment.objects.all()
-    serializer_class = CommentSerializer
-
-
 class ChallengeViewset(viewsets.ModelViewSet):
     queryset = Challenge.objects.all()
-    serializer_class = ChallengeSerializerView
-
+    serializer_class = ChallengeViewSerializer
 
 class ChallengeAPIView(APIView):
-    def get(self, rquest, format=None):
-        item = Challenge.objects.all()
-        serializer = ChallengeSerializer(item, many=True)
-        return Response(serializer.data)
 
     def post(self, request, format=None):
         form = {
             "name": request.data.get('name', ),
             "description": request.data.get('description', ),
             "image": request.data.get('image', ),
-            "video": request.data.get('video', ),
             "user": request.data.get('user', ),
         }
         serializer = ChallengeSerializer(data=form)
@@ -332,19 +369,16 @@ class ChallengeAPIView(APIView):
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
-
 class ChallengeAPIViewUpdate(APIView):
-    def get(self, request, pk, fotmat=None):
+    def get(self, request, pk, format=None):
         try:
             item = Challenge.objects.get(pk=pk)
             serializer = ChallengeSerializer(item)
             return Response(serializer.data)
-        except InChallenge.DoesNotExist:
+        except PlaylistVideo.DoesNotExist:
             return Response(status=404)
 
-    @csrf_exempt
     def put(self, request, pk, format=None):
-        # request.data['image'] = convertImagetofile(request.data.get('image'))
         try:
             item = Challenge.objects.get(pk=pk)
         except Challenge.DoesNotExist:
@@ -356,7 +390,6 @@ class ChallengeAPIViewUpdate(APIView):
         return Response(serializer.errors, status=400)
 
     def delete(self, request, pk, format=None):
-
         try:
             item = Challenge.objects.get(pk=pk)
         except Challenge.DoesNotExist:
@@ -364,52 +397,114 @@ class ChallengeAPIViewUpdate(APIView):
         item.delete()
         return Response(status=204)
 
-# class CommentAPIView(APIView):
-#     def get(self, rquest, format=None):
-#         item = Challenge.objects.all()
-#         serializer = ChallengeSerializer(item, many=True)
-#         return Response(serializer.data)
-#
-#     def post(self, request, format=None):
-#         form = {
-#             "name": request.data.get('name', ),
-#             "description": request.data.get('description', ),
-#             "image": request.data.get('image', ),
-#             "video": request.data.get('video', ),
-#             "user": request.data.get('user', ),
-#         }
-#         serializer = ChallengeSerializer(data=form)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=201)
-#         return Response(serializer.errors, status=400)
-
-
-class InChallengeAPIView(APIView):
+class VideoChallengeAPIView(APIView):
     def get(self, request, format=None):
-        item = InChallenge.objects.all()
-        serializer = InChallengeSerializerView(item, many=True)
+        item = VideoChallenge.objects.all()
+        serializer = VideoChallengeViewSerializer(item, many=True)
         return Response(serializer.data)
 
     def post(self, request, format=None):
         form = {
-            "comment": request.data.get('commnet', ),
+            "description": request.data.get('description', ),
+            "video": request.data.get('video', ),
+            "image": request.data.get('image', ),
             "challenge": request.data.get('challenge', ),
+            "user": request.data.get('user', ),
         }
-        serializer = InChallengeSerailizer(data=form)
+        serializer = VideoChallengeSerializer(data=form)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
+class VideoChallengeAPIViewUpdate(APIView):
+    def get(self, request, pk, format=None):
+        try:
+            item = VideoChallenge.objects.get(pk=pk)
+            serializer = VideoChallengeViewSerializer(item)
+            return Response(serializer.data)
+        except PlaylistVideo.DoesNotExist:
+            return Response(status=404)
 
-class InChallengeAPIViewUpdate(APIView):
+    def put(self, request, pk, format=None):
+        try:
+            item = VideoChallenge.objects.get(pk=pk)
+        except VideoChallenge.DoesNotExist:
+            return Response(status=404)
+        serializer = VideoViewSerializer(item, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+
+    def delete(self, request, pk, format=None):
+        try:
+            item = VideoChallenge.objects.get(pk=pk)
+        except VideoChallenge.DoesNotExist:
+            return Response(status=404)
+        item.delete()
+        return Response(status=204)
+
+class InChallengeAPIView(APIView):
+    def get(self, request, format=None):
+        item = InChallenge.objects.all()
+        serializer = InChallengeSerializer(item, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        form = {
+            "video": request.data.get('video', ),
+            "playlist": request.data.get('playlist', ),
+        }
+        serializer = InChallengeSerializer(data=form)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
+class InChallengeAPIViewUpdeta(APIView):
     def get(self, request, pk, format=None):
         try:
             item = InChallenge.objects.filter(challenge=pk)
-            serializer = InChallengeSerializerView(item, many=True)
+            serializer = InChallengeViewSerializer(item, many=True)
             return Response(serializer.data)
-        except InChallenge.DoesNotExist:
+        except InPlaylist.DoesNotExist:
+            return Response(status=404)
+
+    def delete(self, request, pk, format=None):
+
+        try:
+            item = InChallenge.objects.get(pk=pk)
+        except InPlaylist.DoesNotExist:
+            return Response(status=404)
+        item.delete()
+        return Response(status=204)
+
+
+class InChallengeAPIView(APIView):
+    def get(self, request, format=None):
+        item = InChallenge.objects.all()
+        serializer = InChallengeSerializer(item, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        form = {
+            "video": request.data.get('video', ),
+            "playlist": request.data.get('playlist', ),
+        }
+        serializer = InChallengeSerializer(data=form)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
+class InChallengeAPIViewUpdeta(APIView):
+    def get(self, request, pk, format=None):
+        try:
+            item = InChallenge.objects.filter(challenge=pk)
+            serializer = InChallengeViewSerializer(item, many=True)
+            return Response(serializer.data)
+        except InPlaylist.DoesNotExist:
             return Response(status=404)
 
     def delete(self, request, pk, format=None):
@@ -420,6 +515,45 @@ class InChallengeAPIViewUpdate(APIView):
             return Response(status=404)
         item.delete()
         return Response(status=204)
+
+
+class InVideoChallengeAPIView(APIView):
+    def get(self, request, format=None):
+        item = InVideoChallenge.objects.all()
+        serializer = InVideoChallengeSerializer(item, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        form = {
+            "video": request.data.get('video', ),
+            "user": request.data.get('user', ),
+        }
+        serializer = InVideoChallengeSerializer(data=form)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
+class InVideoChallengeAPIViewUpdeta(APIView):
+    def get(self, request, pk, format=None):
+        try:
+            item = InVideoChallenge.objects.filter(challenge=pk)
+            serializer = InVideoChallengeViewSerializer(item, many=True)
+            return Response(serializer.data)
+        except InPlaylist.DoesNotExist:
+            return Response(status=404)
+
+    def delete(self, request, pk, format=None):
+
+        try:
+            item = InVideoChallenge.objects.get(pk=pk)
+        except InVideoChallenge.DoesNotExist:
+            return Response(status=404)
+        item.delete()
+        return Response(status=204)
+
+
+
 
 # class ViewHistoryViewset(viewsets.ModelViewSet):
 #     queryset = ViewHistory.objects.all()

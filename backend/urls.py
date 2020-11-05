@@ -11,9 +11,8 @@ router.register('videos', views.VideoViewset)
 router.register('tag', views.TagViewset)
 router.register('tagdetail', views.TagDetailViewset)
 router.register('playlists', views.PlaylistVideoViewset)
-router.register('challenges', views.ChallengeViewset)
-router.register('comments', views.CommentViewset)
 router.register('userdetail', views.UserDetailViewViewset)
+router.register('challenges', views.ChallengeViewset)
 
 
 
@@ -21,8 +20,12 @@ router.register('userdetail', views.UserDetailViewViewset)
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
     path('', include(router.urls)),
+    path('admin/', views.AdminAPIView.as_view()),
+    path('changetoadmin/', views.ChangeToAdmin.as_view()),
     path('user/', views.UserAPIView.as_view()),
     path('user/<int:pk>', views.UserUpdateAPIView.as_view()),
+    path('userprofile/', views.UserProfileAPIView.as_view()),
+    path('userprofile/<int:pk>', views.UserProfileAPIViewUpdate.as_view()),
     path('profile/password/<id>/', views.ChangePassword.as_view(), name='ChangePassword'),
     path('change/password/', views.UpdatePassword.as_view(), name='all_profile'),
     path('video', views.VideoAPIView.as_view()),
@@ -35,8 +38,14 @@ urlpatterns = [
     path('adminplaylist/', views.PlaylistVideoGetByStaffAPIView.as_view()),
     path('challenge/', views.ChallengeAPIView.as_view()),
     path('challenge/<int:pk>', views.ChallengeAPIViewUpdate.as_view()),
+    path('videochallenge/', views.VideoChallengeAPIView.as_view()),
+    path('videochallenge/<int:pk>', views.VideoChallengeAPIView.as_view()),
     path('inchallenge/', views.InChallengeAPIView.as_view()),
-    path('inchallenge/<int:pk>', views.InChallengeAPIViewUpdate.as_view()),
+    path('inchallenge/<int:pk>', views.InChallengeAPIViewUpdeta.as_view()),
+    path('invideochallenge/', views.InVideoChallengeAPIView.as_view()),
+    path('invideochallenge/<int:pk>', views.InVideoChallengeAPIViewUpdeta.as_view()),
+
+
 
     # path('videos', views.VideoAPIListView.as_view()),
 
