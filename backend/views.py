@@ -206,15 +206,17 @@ class VideoAPIViewUpdate(generics.RetrieveUpdateDestroyAPIView):
 
     @csrf_exempt
     def put(self, request, pk, format=None):
-        request.data['image'] = convertImagetofile(request.data.get('image'))
+        # request.data['image'] = convertImagetofile(request.data.get('image'))
         tags = list(map(int, request.data.get('tag_type', ).split(',')))
         form = {
             "tag_type": tags,
             "name": request.data.get('name', ),
-            "image": request.data.get('image', ),
+            # "image": request.data.get('image', ),
             "description": request.data.get('description', ),
 
         }
+        if request.data.get('image'):
+            form['image'] = request.data.get('image',)
         try:
             item = Video.objects.get(pk=pk)
         except Video.DoesNotExist:
