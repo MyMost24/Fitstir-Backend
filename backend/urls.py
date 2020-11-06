@@ -30,6 +30,7 @@ urlpatterns = [
     path('change/password/', views.UpdatePassword.as_view(), name='all_profile'),
     path('video', views.VideoAPIView.as_view()),
     path('video/<int:pk>', views.VideoAPIViewUpdate.as_view()),
+    path('videobytag/<int:pk>', views.VideoByTagAPIView.as_view()),
     path('playlist/', views.PlaylistVideoCreateAPIView.as_view()),
     path('playlist/<int:pk>', views.PlaylistVideoAPIViewUpdate.as_view()),
     path('videoplaylist/', views.PlaylistAPIView.as_view()),

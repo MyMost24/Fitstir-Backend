@@ -173,6 +173,15 @@ class VideoViewset(viewsets.ModelViewSet):
     queryset = Video.objects.all()
     serializer_class = VideoViewSerializer
 
+class VideoByTagAPIView(APIView):
+    def get(self, request, pk, format=None):
+        try:
+            item = Video.objects.filter(tag_type__detail_id=pk)
+            serializer = VideoViewSerializer(item, many=True)
+            return Response(serializer.data)
+        except InPlaylist.DoesNotExist:
+            return Response(status=404)
+
 
 class VideoAPIView(APIView):
     def get(self, request, pk, format=None):
@@ -492,7 +501,7 @@ class InChallengeAPIView(APIView):
     def post(self, request, format=None):
         form = {
             "video": request.data.get('video', ),
-            "playlist": request.data.get('playlist', ),
+            "challenge": request.data.get('challenge', ),
         }
         serializer = InChallengeSerializer(data=form)
         if serializer.is_valid():
