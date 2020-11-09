@@ -384,7 +384,7 @@ class ChallengeAPIViewUpdate(APIView):
     def get(self, request, pk, format=None):
         try:
             item = Challenge.objects.get(pk=pk)
-            serializer = ChallengeSerializer(item)
+            serializer = ChallengeViewSerializer(item)
             return Response(serializer.data)
         except PlaylistVideo.DoesNotExist:
             return Response(status=404)
