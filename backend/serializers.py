@@ -124,6 +124,7 @@ class InPlaylistSerializer(ModelSerializer):
 
 class InPlaylistSeializerView(ModelSerializer):
     video = VideoSerializer(read_only=True)
+    playlist = PlaylistVideoSerializer(read_only=True)
     class Meta:
         model = InPlaylist
         fields = '__all__'
@@ -172,7 +173,7 @@ class InChallengeSerializer(ModelSerializer):
         fields = '__all__'
 
 class InChallengeViewSerializer(ModelSerializer):
-    challenge = ChallengeSerializer(read_only=True)
+    challenge = ChallengeViewSerializer(read_only=True)
     video = VideoChallengeViewSerializer(read_only=True)
     class Meta:
         model = InChallenge
@@ -185,7 +186,7 @@ class InVideoChallengeSerializer(ModelSerializer):
 
 class InVideoChallengeViewSerializer(ModelSerializer):
     video = VideoChallengeViewSerializer(read_only=True)
-    user = UserSerializer(read_only=True)
+    comment = CommentSerializerView(read_only=True)
     class Meta:
         model = InVideoChallenge
         fields = '__all__'

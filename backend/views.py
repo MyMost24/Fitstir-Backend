@@ -416,7 +416,7 @@ class VideoChallengeAPIView(APIView):
 
     def post(self, request, format=None):
         form = {
-            "description": request.data.get('description', ),
+            "title": request.data.get('title', ),
             "video": request.data.get('video', ),
             "image": request.data.get('image', ),
             "challenge": request.data.get('challenge', ),
@@ -537,7 +537,7 @@ class InVideoChallengeAPIView(APIView):
     def post(self, request, format=None):
         form = {
             "video": request.data.get('video', ),
-            "user": request.data.get('user', ),
+            "comment": request.data.get('comment', ),
         }
         serializer = InVideoChallengeSerializer(data=form)
         if serializer.is_valid():
@@ -548,7 +548,7 @@ class InVideoChallengeAPIView(APIView):
 class InVideoChallengeAPIViewUpdeta(APIView):
     def get(self, request, pk, format=None):
         try:
-            item = InVideoChallenge.objects.filter(challenge=pk)
+            item = InVideoChallenge.objects.filter(video=pk)
             serializer = InVideoChallengeViewSerializer(item, many=True)
             return Response(serializer.data)
         except InPlaylist.DoesNotExist:

@@ -73,8 +73,8 @@ class Challenge(models.Model):
 
 class VideoChallenge(models.Model):
     video = models.FileField(upload_to='challenge_video', verbose_name='Challenge Video')
-    image = models.FileField(upload_to='challenge_image', verbose_name='Challenge Video Challenge')
-    description = models.TextField(max_length=5500, null=True, blank=True)
+    image = models.FileField(upload_to='challenge_image', verbose_name='Challenge Image')
+    title = models.TextField(max_length=5500, null=True, blank=True)
     challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
