@@ -40,11 +40,13 @@ urlpatterns = [
     path('challenge/', views.ChallengeAPIView.as_view()),
     path('challenge/<int:pk>', views.ChallengeAPIViewUpdate.as_view()),
     path('videochallenge/', views.VideoChallengeAPIView.as_view()),
-    path('videochallenge/<int:pk>', views.VideoChallengeAPIView.as_view()),
+    path('videochallenge/<int:pk>', views.VideoChallengeAPIViewUpdate.as_view()),
     path('inchallenge/', views.InChallengeAPIView.as_view()),
     path('inchallenge/<int:pk>', views.InChallengeAPIViewUpdeta.as_view()),
     path('invideochallenge/', views.InVideoChallengeAPIView.as_view()),
     path('invideochallenge/<int:pk>', views.InVideoChallengeAPIViewUpdeta.as_view()),
+    path('comment/', views.CommentAPIView.as_view()),
+    path('comment/<int:pk>', views.CommentAPIViewUpdate.as_view()),
 
 
 

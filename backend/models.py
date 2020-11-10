@@ -6,9 +6,9 @@ from polymorphic.models import PolymorphicModel
 
 class UserDetail(models.Model):
     image = models.FileField(upload_to='user/', null=True, blank=True)
-    birthday = models.DateField()
-    phone_number = models.CharField(max_length=15,)
-    address = models.TextField(max_length=255)
+    birthday = models.DateField(null=True, blank=True)
+    phone_number = models.CharField(max_length=15, null=True, blank=True)
+    address = models.TextField(max_length=255, null=True, blank=True)
     high = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     weight = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     bmi = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
@@ -68,8 +68,16 @@ class Challenge(models.Model):
     description = models.TextField(max_length=2500, null=True, blank=True, default='No description')
     image = models.FileField(upload_to='challenge_image', verbose_name='Challenge Image', null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    @property
+    def full_name(self):
+        return "%s %s" % (self.user.first_name, self.user.last_name)
+
     def __str__(self):
         return '{}'.format(self.name)
+
+
+
 
 class VideoChallenge(models.Model):
     video = models.FileField(upload_to='challenge_video', verbose_name='Challenge Video')

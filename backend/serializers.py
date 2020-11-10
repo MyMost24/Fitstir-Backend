@@ -40,7 +40,7 @@ class UserUpdateSerailizer(serializers.ModelSerializer):
 
 
 class UserDetailViewSerializer(ModelSerializer):
-    user = UserSerializer(read_only=True)
+    user = UserUpdateSerailizer(read_only=True)
     class Meta:
         model = UserDetail
         fields = '__all__'
@@ -134,7 +134,7 @@ class InPlaylistSeializerView(ModelSerializer):
 #NEWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
 
 class CommentSerializerView(ModelSerializer):
-    user = UserUpdateSerailizer(read_only=True)
+    user = UserViewSerializer(read_only=True)
     class Meta:
         model= Comment
         fields = '__all__'
@@ -150,7 +150,7 @@ class ChallengeSerializer(ModelSerializer):
         fields = '__all__'
 
 class ChallengeViewSerializer(ModelSerializer):
-    user = UserSerializer(read_only=True)
+    user = UserViewSerializer(read_only=True)
     class Meta:
         model = Challenge
         fields = '__all__'
@@ -162,7 +162,7 @@ class VideoChallengeSerializer(ModelSerializer):
         fields = '__all__'
 
 class VideoChallengeViewSerializer(ModelSerializer):
-    user = UserUpdateSerailizer(read_only=True)
+    user = UserViewSerializer(read_only=True)
     class Meta:
         model = VideoChallenge
         fields = '__all__'

@@ -123,6 +123,7 @@ class UserUpdateAPIView(APIView):
         return Response(status=204)
 
 class UserProfileAPIView(APIView):
+
     def post(self, request, format=None):
         form = {
 
@@ -145,8 +146,8 @@ class UserProfileAPIView(APIView):
 class UserProfileAPIViewUpdate(APIView):
     def get(self, request, pk, format=None):
         try:
-            item = UserDetail.objects.filter(user=pk)
-            serializer = UserDetailSerializer(item)
+            item = UserDetail.objects.filter(user_id=pk)
+            serializer = UserDetailViewSerializer(item)
             return Response(serializer.data)
         except UserDetail.DoesNotExist:
             return Response(status=404)
@@ -465,7 +466,7 @@ class InChallengeAPIView(APIView):
     def post(self, request, format=None):
         form = {
             "video": request.data.get('video', ),
-            "playlist": request.data.get('playlist', ),
+            "challenge": request.data.get('challenge', ),
         }
         serializer = InChallengeSerializer(data=form)
         if serializer.is_valid():
@@ -531,7 +532,7 @@ class InChallengeAPIViewUpdeta(APIView):
 class InVideoChallengeAPIView(APIView):
     def get(self, request, format=None):
         item = InVideoChallenge.objects.all()
-        serializer = InVideoChallengeSerializer(item, many=True)
+        serializer = InVideoChallengeViewSerializer(item, many=True)
         return Response(serializer.data)
 
     def post(self, request, format=None):
@@ -563,6 +564,48 @@ class InVideoChallengeAPIViewUpdeta(APIView):
         item.delete()
         return Response(status=204)
 
+class CommentAPIView(APIView):
+    def get(self, request, format=None):
+        item = Comment.objects.all()
+        serializer = CommentSerializerView(item, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        form = {
+            "video": request.data.get('video', ),
+            "user": request.data.get('user', ),
+            "commentText": request.data.get('commentText', ),
+        }
+        serializer = CommentSerializer(data=form)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
+class CommentAPIViewUpdate(APIView):
+    def get(self, request, pk, format=None):
+        item = Comment.objects.get(pk=pk)
+        serializer = CommentSerializerView(item, many=True)
+        return Response(serializer.data)
+
+    def put(self, request, pk, format=None):
+        try:
+            item = Comment.objects.get(pk=pk)
+        except Comment.DoesNotExist:
+            return Response(status=404)
+        serializer = CommentSerializer(item, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+
+    def delete(self, request, pk, format=None):
+        try:
+            item = Comment.objects.get(pk=pk)
+        except Comment.DoesNotExist:
+            return Response(status=404)
+        item.delete()
+        return Response(status=204)
 
 
 
