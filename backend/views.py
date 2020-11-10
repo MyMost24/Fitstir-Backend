@@ -88,7 +88,6 @@ class ChangeToAdmin(APIView):
     def post(self, request, format=None):
         user = User.objects.get(request.data.get('user'))
         user.is_staff = True
-        user.is_active = False
         user.save()
         return Response({"success": "GG"})
 
