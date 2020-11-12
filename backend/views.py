@@ -18,7 +18,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from .serializers import VideoSerializer, VideoViewSerializer, VideoSerializerUpdate, \
     TagSerializer, TagDetailSerializer, PlaylistVideoSerializerUpdate, PlaylistVideoSerializerView, \
-    PlaylistVideoSerializer, InPlaylistSerializer, InPlaylistSeializerView, \
+    PlaylistVideoSerializer, InPlaylistSerializer, InPlaylistSeializerView, VideoChallengeSerializerUpdate,\
     CommentSerializer, ChangePasswordSerializer, UserViewSerializer, UserDetailViewSerializer, \
     UserDetailSerializer, UserSerializer, UserUpdateSerailizer, CommentSerializerView, CommentSerializer, \
     ChallengeSerializer, ChallengeViewSerializer, VideoChallengeSerializer, VideoChallengeViewSerializer, \
@@ -371,9 +371,10 @@ class ChallengeAPIView(APIView):
         form = {
             "name": request.data.get('name', ),
             "description": request.data.get('description', ),
-            "image": request.data.get('image', ),
             "user": request.data.get('user', ),
         }
+        if request.data.get('image'):
+            form['image'] = request.data.get('image',)
         serializer = ChallengeSerializer(data=form)
         if serializer.is_valid():
             serializer.save()
@@ -442,7 +443,7 @@ class VideoChallengeAPIViewUpdate(APIView):
             item = VideoChallenge.objects.get(pk=pk)
         except VideoChallenge.DoesNotExist:
             return Response(status=404)
-        serializer = VideoViewSerializer(item, data=request.data)
+        serializer = VideoChallengeSerializerUpdate(item, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

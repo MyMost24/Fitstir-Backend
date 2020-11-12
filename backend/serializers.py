@@ -1,5 +1,6 @@
 from rest_framework.serializers import ModelSerializer
-from backend.models import UserDetail, Tag, TagDetail, Video, PlaylistVideo, Comment, Challenge, InPlaylist, InChallenge, InVideoChallenge, VideoChallenge
+from backend.models import UserDetail, Tag, TagDetail, Video, PlaylistVideo, Comment, Challenge, InPlaylist, \
+    InChallenge, InVideoChallenge, VideoChallenge
 from django.db import models
 from rest_framework import serializers
 from django.contrib.auth.models import User
@@ -7,9 +8,6 @@ from django.contrib.auth.password_validation import validate_password
 from rest_auth.registration.serializers import RegisterSerializer
 from rest_auth.registration.views import RegisterView
 from django.views.decorators.csrf import csrf_exempt
-
-
-
 
 
 class ChangePasswordSerializer(serializers.Serializer):
@@ -24,9 +22,7 @@ class ChangePasswordSerializer(serializers.Serializer):
         return value
 
 
-
 class UserSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
         fields = ['id', 'first_name', 'last_name', 'email', 'username', 'password', 'is_active']
@@ -38,9 +34,9 @@ class UserUpdateSerailizer(serializers.ModelSerializer):
         fields = ['id', 'first_name', 'last_name', 'email', 'is_staff']
 
 
-
 class UserDetailViewSerializer(ModelSerializer):
     user = UserUpdateSerailizer(read_only=True)
+
     class Meta:
         model = UserDetail
         fields = '__all__'
@@ -58,7 +54,6 @@ class UserViewSerializer(ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'first_name', 'last_name', 'email', 'is_staff', 'is_active', 'userdetail']
-
 
 
 class TagDetailSerializer(ModelSerializer):
@@ -85,8 +80,10 @@ class VideoSerializer(ModelSerializer):
         model = Video
         fields = '__all__'
 
+
 class VideoViewSerializer(ModelSerializer):
     tag_type = TagDetailSerializer(many=True, required=False, read_only=True)
+
     class Meta:
         model = Video
         fields = '__all__'
@@ -98,17 +95,19 @@ class VideoSerializerUpdate(ModelSerializer):
         fields = ['name', 'description', 'tag_type', 'image']
 
 
-
 class PlaylistVideoSerializerView(ModelSerializer):
     video = VideoSerializer(read_only=True, many=True)
+
     class Meta:
         model = PlaylistVideo
         fields = '__all__'
+
 
 class PlaylistVideoSerializer(ModelSerializer):
     class Meta:
         model = PlaylistVideo
         fields = '__all__'
+
 
 class PlaylistVideoSerializerUpdate(ModelSerializer):
     class Meta:
@@ -116,41 +115,46 @@ class PlaylistVideoSerializerUpdate(ModelSerializer):
         fields = ['id', 'name', 'image', 'description']
 
 
-
 class InPlaylistSerializer(ModelSerializer):
-    class Meta:
-        model =InPlaylist
-        fields = '__all__'
-
-class InPlaylistSeializerView(ModelSerializer):
-    video = VideoSerializer(read_only=True)
-    playlist = PlaylistVideoSerializer(read_only=True)
     class Meta:
         model = InPlaylist
         fields = '__all__'
 
 
+class InPlaylistSeializerView(ModelSerializer):
+    video = VideoSerializer(read_only=True)
+    playlist = PlaylistVideoSerializer(read_only=True)
 
-#NEWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+    class Meta:
+        model = InPlaylist
+        fields = '__all__'
+
+
+# NEWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
 
 class CommentSerializerView(ModelSerializer):
     user = UserViewSerializer(read_only=True)
+
     class Meta:
-        model= Comment
+        model = Comment
         fields = '__all__'
+
 
 class CommentSerializer(ModelSerializer):
     class Meta:
         model = Comment
         fields = '__all__'
 
+
 class ChallengeSerializer(ModelSerializer):
     class Meta:
         model = Challenge
         fields = '__all__'
 
+
 class ChallengeViewSerializer(ModelSerializer):
     user = UserViewSerializer(read_only=True)
+
     class Meta:
         model = Challenge
         fields = '__all__'
@@ -161,42 +165,49 @@ class VideoChallengeSerializer(ModelSerializer):
         model = VideoChallenge
         fields = '__all__'
 
+class VideoChallengeSerializerUpdate(ModelSerializer):
+
+    class Meta:
+        model = VideoChallenge
+        fields = ['title']
+
+
 class VideoChallengeViewSerializer(ModelSerializer):
     user = UserViewSerializer(read_only=True)
+
     class Meta:
         model = VideoChallenge
         fields = '__all__'
+
 
 class InChallengeSerializer(ModelSerializer):
     class Meta:
         model = InChallenge
         fields = '__all__'
 
+
 class InChallengeViewSerializer(ModelSerializer):
     challenge = ChallengeViewSerializer(read_only=True)
     video = VideoChallengeViewSerializer(read_only=True)
+
     class Meta:
         model = InChallenge
         fields = '__all__'
+
 
 class InVideoChallengeSerializer(ModelSerializer):
     class Meta:
         model = InVideoChallenge
         fields = '__all__'
 
+
 class InVideoChallengeViewSerializer(ModelSerializer):
     video = VideoChallengeViewSerializer(read_only=True)
     comment = CommentSerializerView(read_only=True)
+
     class Meta:
         model = InVideoChallenge
         fields = '__all__'
-
-
-
-
-
-
-
 
 # class ViewHistorySerializer(ModelSerializer):
 #     video = VideoSerializer(read_only=True)
